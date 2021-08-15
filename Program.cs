@@ -24,7 +24,7 @@ namespace KafkaConsumer
 
                     if (consumeResult != null)
                     {
-                        Console.WriteLine($"New message on {consumeResult.Topic}: {consumeResult.Message.Value}");
+                        Console.WriteLine($"New message on {consumeResult.Topic} at {consumeResult.Message.Timestamp.UtcDateTime.ToString("o")}: {consumeResult.Message.Value}");
                     }
                 }
             }
