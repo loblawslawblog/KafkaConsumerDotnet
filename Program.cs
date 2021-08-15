@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using Confluent.Kafka;
+using Newtonsoft.Json;
 
 namespace KafkaConsumer
 {
@@ -16,7 +18,7 @@ namespace KafkaConsumer
 
             using (var consumer = new ConsumerBuilder<Ignore, string>(config).Build())
             {
-                consumer.Subscribe("quickstart-events");
+                consumer.Subscribe(new List<string> {"quickstart-events", "person-events"});
 
                 while (true)
                 {
@@ -24,7 +26,18 @@ namespace KafkaConsumer
 
                     if (consumeResult != null)
                     {
-                        Console.WriteLine($"New message on {consumeResult.Topic} at {consumeResult.Message.Timestamp.UtcDateTime.ToString("o")}: {consumeResult.Message.Value}");
+                        string message = "";
+                        if (consumeResult.Topic == "person-events")
+                        {
+                            var person = JsonConvert.DeserializeObject<Person>(consumeResult.Message.Value);
+                            message = person.ToString();
+                        }
+                        else
+                        {
+                            message = consumeResult.Message.Value;
+                        }
+
+                        Console.WriteLine($"New message on {consumeResult.Topic} at {consumeResult.Message.Timestamp.UtcDateTime.ToString("o")}: {message}");
                     }
                 }
             }
